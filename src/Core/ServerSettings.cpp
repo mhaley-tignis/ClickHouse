@@ -1585,6 +1585,15 @@ The policy on how to perform a scheduling of CPU slots specified by `concurrent_
     ```xml
     <skip_check_for_incorrect_settings>1</skip_check_for_incorrect_settings>
     ```
+    )", 0) \
+    DECLARE(Bool, enable_token_auth, true, R"(
+    Controls whether token-based (JWT) authentication is enabled.
+    When disabled:
+    - Token processors from the `token_processors` section are not parsed.
+    - `TokenAccessStorage` (token user directory) is not added.
+    - Authentication via tokens (`--jwt` option in clickhouse-client or `Authorization: Bearer` HTTP header) is rejected.
+
+    Default value: `true` (token authentication is enabled).
     )", 0)
 
 /// Settings with a path are server settings with at least one layer of nesting that have a fixed structure (no lists, lists, enumerations, repetitions, ...).

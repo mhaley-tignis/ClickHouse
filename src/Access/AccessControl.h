@@ -51,6 +51,7 @@ class ClientInfo;
 class ExternalAuthenticators;
 class AccessChangesNotifier;
 struct Settings;
+struct ConnectionTimeouts;
 
 
 /// Manages access control entities.
@@ -93,6 +94,9 @@ public:
     /// Adds LDAPAccessStorage which allows querying remote LDAP server for user info.
     void addLDAPStorage(const String & storage_name_, const Poco::Util::AbstractConfiguration & config_, const String & prefix_);
 
+    /// Adds TokenAccessStorage which resolves users from validated bearer/JWT tokens.
+    void addTokenStorage(const String & storage_name_, const Poco::Util::AbstractConfiguration & config_, const String & prefix_);
+
     void addReplicatedStorage(const String & storage_name,
                               const String & zookeeper_path,
                               const zkutil::GetZooKeeper & get_zookeeper_function,
@@ -133,7 +137,7 @@ public:
     /// Makes a backup of access entities.
     void restoreFromBackup(RestorerFromBackup & restorer, const String & data_path_in_backup) override;
 
-    void setExternalAuthenticatorsConfig(const Poco::Util::AbstractConfiguration & config);
+    void setExternalAuthenticatorsConfig(const Poco::Util::AbstractConfiguration & config, const ConnectionTimeouts & token_http_timeouts);
 
     /// Sets the default profile's name.
     /// The default profile's settings are always applied before any other profile's.
@@ -271,6 +275,10 @@ public:
     bool getAllowExperimentalTierSettings() const;
     bool getAllowBetaTierSettings() const;
 
+    /// Controls whether token-based (JWT / bearer) authentication is enabled.
+    void setTokenAuthEnabled(bool enable);
+    bool isTokenAuthEnabled() const;
+
 private:
     class ContextAccessCache;
     class CustomSettingsPrefixes;
@@ -307,6 +315,7 @@ private:
     std::atomic_bool enable_user_name_access_type = true;
     std::atomic_bool enable_read_write_grants = false;
     std::atomic_bool allow_impersonate_user = false;
+    std::atomic_bool enable_token_auth = true;
 };
 
 }
